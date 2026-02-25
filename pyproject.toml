@@ -1,0 +1,87 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
+[project]
+name = "addse"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+classifiers = [ "Programming Language :: Python :: 3 :: Only", "Programming Language :: Python :: 3.12" ]
+dependencies = [
+  "discrete-speech-metrics",
+  "hydra-core>=1.3.2",
+  "levenshtein>=0.27.3",
+  "librosa>=0.11",
+  "lightning>=2.6",
+  "litdata>=0.2.61",
+  "mel-cepstral-distance",
+  "mkdocs-material>=9.6.20",
+  "mkdocstrings-python>=1.18.2",
+  "mypy>=1.18.2",
+  "numba>=0.62",
+  "numpy>=2.3.3",
+  "omegaconf>=2.3",
+  "onnxruntime>=1.23.2",
+  "pesq>=0.0.4",
+  "phonemizer>=3.3",
+  "polars>=1.33.1",
+  "pre-commit>=4.3",
+  "pyarrow>=21",
+  "pystoi>=0.4.1",
+  "pytest>=8.4.2",
+  "pytest-cov>=7",
+  "python-dotenv>=1.1.1",
+  "ruff>=0.13.2",
+  "scipy>=1.16.2",
+  "scoreq>=1.0.1",
+  "setuptools>=80.8",
+  "soundfile>=0.13.1",
+  "soxr>=1",
+  "torch>=2.8",
+  "tqdm>=4.67.1",
+  "transformers>=4.57.3",
+  "typer>=0.20",
+  "utmosv2",
+  "wandb>=0.22",
+]
+
+scripts.addse = "addse.app:app"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "addse" ]
+
+[tool.ruff]
+line-length = 120
+lint.extend-select = [
+  "ANN",
+  "C4",
+  "D",
+  "E",
+  "F",
+  "I",
+  "PT",
+  "RET",
+  "S",
+  "SIM",
+  "UP",
+  "W",
+]
+lint.ignore = [
+  "ANN401", # Dynamically typed expressions (typing.Any) are disallowed in {name}
+  "D100",   # Missing docstring in public module
+  "D104",   # Missing docstring in public package
+  "S101",   # Use of `assert` detected
+  "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
+]
+lint.flake8-annotations.allow-star-arg-any = true
+lint.pydocstyle.convention = "google"
+
+[tool.mypy]
+disable_error_code = [ "import-untyped" ]
+
+[tool.uv.sources]
+utmosv2 = { git = "https://github.com/sarulab-speech/UTMOSv2.git", rev = "v1.2.1" }
+discrete-speech-metrics = { git = "https://github.com/philgzl/DiscreteSpeechMetrics.git", rev = "no-pypesq" }
+mel-cepstral-distance = { git = "https://github.com/philgzl/mel-cepstral-distance", rev = "array-input" }

@@ -1,0 +1,16 @@
+ears:
+  train: ^.*/p0[0-9][0-9]/.*\.wav$
+  val: ^.*/p10[0-1]/.*\.wav$
+  test: ^.*/p10[2-7]/.*\.wav$
+wham:
+  train: ^.*/file(0[0-9][0-9]|1[0-7][0-9]|18[0-8]).*\.wav$
+  val: ^.*/file(189|19[0-9]|2[0-1][0-9]|22[0-5]).*\.wav$
+  test: ^.*/file(22[6-9]|2[3-4][0-9]).*\.wav$
+  seglen: 10.0
+libri:
+  train: ^.*/train-clean-(100|360)/.*\.flac$
+  val: ^.*/dev-clean/.*\.flac$
+  test: ^.*/test-clean/.*\.flac$
+fsd50k:
+  dev: ^.*/dev_audio/.*\.wav$
+  eval: ^.*/eval_audio/.*\.wav$

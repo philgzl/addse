@@ -1,0 +1,173 @@
+seed: 42
+fs: 16000
+train_segment_length: 4.0
+val_segment_length: 10.0
+max_dynamic_range: 25.0
+num_workers: 8
+
+lm:
+  _target_: addse.lightning.ADDSELightningModule
+  nac_cfg: configs/nac.yaml
+  nac_ckpt: logs/nac/checkpoints/last.ckpt
+  model:
+    _target_: addse.models.ADDSERQDiT
+    input_channels: 1024
+    output_channels: 1024
+    num_codebooks: 4
+    hidden_dim: 192
+    num_layers: 12
+    num_heads: 12
+    max_seq_len: 1024
+    conditional: true
+    time_independent: true
+  num_steps: 128
+  block_size: 200
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 1.0e-4
+    eps: 1.0e-7
+  debug_sample: [0, 0]
+
+dm:
+  _target_: addse.lightning.DataModule
+  train_dataset:
+    _target_: addse.data.DynamicMixingDataset
+    _partial_: true
+    length: .inf
+    resume: true
+    reset_rngs: false
+    speech_dataset:
+      _target_: addse.data.AudioStreamingDataset
+      input_dir: data/chunks/bigspeech/
+      fs: ${fs}
+      segment_length: ${train_segment_length}
+      max_dynamic_range: ${max_dynamic_range}
+      seed: ${seed}
+    noise_dataset:
+      _target_: addse.data.AudioStreamingDataset
+      input_dir: data/chunks/bignoise/
+      fs: ${fs}
+      segment_length: ${train_segment_length}
+      max_dynamic_range: ${max_dynamic_range}
+      seed: ${seed}
+  val_dataset:
+    _target_: addse.data.DynamicMixingDataset
+    _partial_: true
+    length: .inf
+    resume: false
+    reset_rngs: true
+    speech_dataset:
+      _target_: addse.data.AudioStreamingDataset
+      input_dir: hf://datasets/philgzl/ears/data/val-*.parquet
+      fs: ${fs}
+      segment_length: ${val_segment_length}
+      max_dynamic_range: ${max_dynamic_range}
+      seed: ${seed}
+    noise_dataset:
+      _target_: addse.data.AudioStreamingDataset
+      input_dir: hf://datasets/philgzl/wham/data/val-*.parquet
+      fs: ${fs}
+      segment_length: ${val_segment_length}
+      max_dynamic_range: ${max_dynamic_range}
+      seed: ${seed}
+  train_dataloader:
+    _target_: addse.data.AudioStreamingDataLoader
+    _partial_: true
+    batch_size: 16
+    num_workers: ${num_workers}
+    shuffle: true
+  val_dataloader:
+    _target_: addse.data.AudioStreamingDataLoader
+    _partial_: true
+    batch_size: 1
+    num_workers: ${num_workers}
+    shuffle: false
+
+trainer:
+  _target_: lightning.Trainer
+  limit_train_batches: 1000
+  limit_val_batches: 1
+  max_epochs: 1000
+  gradient_clip_val: 1.0
+  precision: 16-mixed
+
+extra_callbacks:
+  - _target_: addse.callbacks.EMAWeightAveraging
+    decay: 0.999
+
+eval:
+  dsets:
+    libri-tut:
+      _target_: addse.data.DynamicMixingDataset
+      length: 1000
+      resume: false
+      reset_rngs: true
+      rms_range: [0.0, 0.0]
+      speech_dataset:
+        _target_: addse.data.AudioStreamingDataset
+        input_dir: hf://datasets/philgzl/libri/data/test-*.parquet
+        fs: ${fs}
+        segment_length: null
+        max_length: 20.0
+        shuffle: true
+      noise_dataset:
+        _target_: addse.data.AudioStreamingDataset
+        input_dir: hf://datasets/philgzl/tut2020/data/eval-*.parquet
+        fs: ${fs}
+        segment_length: null
+        max_length: 20.0
+        shuffle: true
+    clarity-fsd50k:
+      _target_: addse.data.DynamicMixingDataset
+      length: 1000
+      resume: false
+      reset_rngs: true
+      rms_range: [0.0, 0.0]
+      speech_dataset:
+        _target_: addse.data.AudioStreamingDataset
+        input_dir: data/chunks/clarity/
+        fs: ${fs}
+        segment_length: null
+        max_length: 20.0
+        shuffle: true
+      noise_dataset:
+        _target_: addse.data.AudioStreamingDataset
+        input_dir: hf://datasets/philgzl/fsd50k/data/eval-*.parquet
+        fs: ${fs}
+        segment_length: null
+        max_length: 20.0
+        shuffle: true
+        max_dynamic_range: 20.0
+  metrics:
+    sdr:
+      _target_: addse.metrics.SDRMetric
+      scale_invariant: false
+    estoi:
+      _target_: addse.metrics.STOIMetric
+      fs: ${fs}
+      extended: true
+    pesq:
+      _target_: addse.metrics.PESQMetric
+      fs: ${fs}
+    dnsmos:
+      _target_: addse.metrics.DNSMOSMetric
+      fs: ${fs}
+    nisqa:
+      _target_: addse.metrics.NISQAMetric
+      fs: ${fs}
+    utmos:
+      _target_: addse.metrics.UTMOSMetric
+      fs: ${fs}
+    scoreq:
+      _target_: addse.metrics.SCOREQMetric
+      fs: ${fs}
+    lps:
+      _target_: addse.metrics.LPSMetric
+      fs: ${fs}
+    sbs:
+      _target_: addse.metrics.SBSMetric
+      fs: ${fs}
+    mcd:
+      _target_: addse.metrics.MCDMetric
+      fs: ${fs}

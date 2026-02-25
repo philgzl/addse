@@ -1,0 +1,8 @@
+*.egg-info/
+__pycache__/
+.env
+site/
+logs/
+.coverage
+/data
+.vscode/
