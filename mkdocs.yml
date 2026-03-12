@@ -37,6 +37,9 @@ plugins:
             show_root_members_full_path: true
             show_symbol_type_heading: true
             show_symbol_type_toc: true
+            docstring_style: google
+            docstring_options:
+              returns_multiple_items: false
           inventories:
             - https://docs.python.org/3/objects.inv
             - https://numpy.org/doc/stable/objects.inv

@@ -304,6 +304,7 @@ class NACVQVAE(nn.Module):
 
         Returns:
             A tuple `(codes, quantized, codebook_loss, commit_loss, x_proj, quantized_proj)`:
+
             - `codes`: Assigned vector indices with shape `(batch_size, num_frames)`.
             - `quantized`: Quantized embeddings with shape `(batch_size, emb_channels, num_frames)`.
             - `codebook_loss`: Codebook loss. 0-dimensional.
@@ -334,6 +335,7 @@ class NACVQVAE(nn.Module):
 
         Args:
             x: Input tensor:
+
                 - Shape `(batch_size, num_frames)` if `domain` is `"code"`.
                 - Shape `(batch_size, emb_channels, num_frames)` if `domain` is `"x"`.
                 - Shape `(batch_size, emb_channels, num_frames)` if `domain` is `"q"`.
@@ -401,6 +403,7 @@ class NACRVQVAE(nn.Module):
 
         Returns:
             A tuple `(codes, quantized, codebook_loss, commit_loss, x_proj, quantized_proj)`:
+
             - `codes`: Assigned vector indices. Shape `(batch_size, num_codebooks, num_frames)`.
             - `quantized` Quantized embeddings. Shape `(batch_size, emb_channels, num_frames)` if `no_sum` is `False`
                 else `(batch_size, emb_channels, num_codebooks, num_frames)`.
@@ -442,6 +445,7 @@ class NACRVQVAE(nn.Module):
 
         Args:
             x: Input tensor:
+
                 - If `domain` is `"code"`: Shape `(batch_size, num_codebooks, num_frames)`.
                 - If `domain` is `"x"`: Shape `(batch_size, emb_channels, num_frames)`.
                 - If `domain` is `"q"`: Shape `(batch_size, emb_channels, num_frames)` if `input_no_sum` is `False` else
@@ -581,6 +585,7 @@ class NAC(nn.Module):
             no_sum: If `True`, the quantized embeddings are not summed across codebooks. Ignored if `domain` is not
                 `"q"`.
             domain: Which continuous output to return. One of:
+
                 - `"x"`: Return the encoder output.
                 - `"q"`: Return the quantized embeddings.
                 - `"x_proj"`: Return the projected encoder output in codebook space.
@@ -588,8 +593,10 @@ class NAC(nn.Module):
 
         Returns:
             Tuple `(codes, continuous)`:
+
             - `codes`: Discrete codes. Shape `(batch_size, num_codebooks, num_frames)`.
             - `continuous`: Continuous output:
+
                 - If `domain` is `"x"`: Shape `(batch_size, emb_channels, num_frames)`.
                 - If `domain` is `"q"`: Shape `(batch_size, emb_channels, num_frames)` if `no_sum` is `False` else
                     `(batch_size, emb_channels, num_codebooks, num_frames)`.
@@ -617,6 +624,7 @@ class NAC(nn.Module):
 
         Args:
             x: Input tensor:
+
                 - If `domain` is `"code"`: Shape `(batch_size, num_codebooks, num_frames)`.
                 - If `domain` is `"x"`: Shape `(batch_size, emb_channels, num_frames)`.
                 - If `domain` is `"q"`: Shape `(batch_size, emb_channels, num_frames)` if `no_sum` is `False` else
